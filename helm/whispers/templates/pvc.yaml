@@ -1,0 +1,11 @@
+{{- if .Values.sqlite.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-data
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ default "1Gi" .Values.sqlite.pvc.size }}
+{{- end }}

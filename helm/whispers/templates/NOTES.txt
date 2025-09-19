@@ -1,0 +1,16 @@
+1. Get the application URL:
+
+  {{- if .Values.ingress.enabled }}
+  echo "https://{{ (index .Values.ingress.hosts 0).host }}"
+  {{- else }}
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} kubectl -n {{ .Release.Namespace }} port-forward svc/{{ .Release.Name }} 8080:80 -o jsonpath='{.spec.clusterIP}')
+  echo "http://$SERVICE_IP:{{ .Values.service.port }}"
+  {{- end }}
+
+2. Backend
+  - SQLite: {{ ternary "enabled" "disabled" .Values.sqlite.enabled }} (DB at /data/whispers.db)
+  - Postgres: {{ ternary "enabled" "disabled" .Values.postgresql.enabled }}
+
+3. Secrets
+  - Using existingSecret: {{ ternary "yes" "no" (not (empty .Values.existingSecret)) }}
+  - If yes, ensure Secret includes keys: OIDC_CLIENT_SECRET, SESSION_SECRET, FERNET_KEY

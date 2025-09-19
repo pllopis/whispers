@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}
+data:
+  OIDC_ISSUER: {{ .Values.env.OIDC_ISSUER | quote }}
+  OIDC_CLIENT_ID: {{ .Values.env.OIDC_CLIENT_ID | quote }}
+  OIDC_REDIRECT_URI: {{ .Values.env.OIDC_REDIRECT_URI | quote }}
+  OIDC_SCOPES: {{ .Values.env.OIDC_SCOPES | quote }}
+  GROUPS_CLAIM: {{ .Values.env.GROUPS_CLAIM | quote }}
+  BASE_URL: {{ .Values.env.BASE_URL | quote }}
+  {{- if .Values.postgresql.enabled }}
+  DATABASE_URL: {{ printf "postgresql+psycopg2://%s:%s@%s-postgresql:5432/%s" .Values.postgresql.auth.username .Values.postgresql.auth.password (include "whispers.fullname" .) .Values.postgresql.auth.database | quote }}
+  {{- else if .Values.sqlite.enabled }}
+  DATABASE_URL: "sqlite:////data/whispers.db?check_same_thread=false"
+  {{- else }}
+  DATABASE_URL: {{ .Values.env.DATABASE_URL | quote }}
+  {{- end }}

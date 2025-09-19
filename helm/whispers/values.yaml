@@ -1,0 +1,59 @@
+image:
+  repository: whispers
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: nginx
+  hosts:
+    - host: whispers.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources: {}
+
+env:
+  OIDC_ISSUER: "https://ska-iam.stfc.ac.uk/"
+  OIDC_CLIENT_ID: "ad6c1f2e-a1e8-4d31-9f43-972432778d78"
+  OIDC_CLIENT_SECRET: "AM9_t05Uaq0VZPLmGW8Fw0RKk1ghbcjH7BX4lj3qwdUIVgwRzVnKO42Q0qN48Yy-UGQJqECmdjVh0ksAJDPtXOg"   # Ignored if existingSecret is set
+  OIDC_REDIRECT_URI: "http://localhost:8080/callback"
+  OIDC_SCOPES: "openid profile email groups offline_access"
+  GROUPS_CLAIM: "groups"
+  BASE_URL: "http://localhost:8080"
+  DATABASE_URL: ""  # auto-filled when postgresql.enabled or sqlite.enabled
+
+# Name of an existing Kubernetes Secret that provides sensitive values.
+# If set, the chart will not create its own Secret and will consume this one instead.
+# Expected keys in the Secret: OIDC_CLIENT_SECRET, SESSION_SECRET, FERNET_KEY
+existingSecret: "whispers-secrets"  # e.g., whispers-secrets
+
+# Fallback (only used when existingSecret == "")
+secrets:
+  SESSION_SECRET: ""   # e.g., a long random string
+  FERNET_KEY: ""       # base64 urlsafe Fernet key
+
+postgresql:
+  enabled: false
+  auth:
+    username: whispers
+    password: change_me_db
+    database: whispers
+  primary:
+    persistence:
+      enabled: true
+      size: 1Gi
+
+sqlite:
+  enabled: true
+  pvc:
+    enabled: true
+    size: 1Gi
