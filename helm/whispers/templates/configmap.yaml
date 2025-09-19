@@ -9,6 +9,7 @@ data:
   OIDC_SCOPES: {{ .Values.env.OIDC_SCOPES | quote }}
   GROUPS_CLAIM: {{ .Values.env.GROUPS_CLAIM | quote }}
   BASE_URL: {{ .Values.env.BASE_URL | quote }}
+  PURGE_INTERVAL_SECONDS: {{ .Values.env.PURGE_INTERVAL_SECONDS | quote }}
   {{- if .Values.postgresql.enabled }}
   DATABASE_URL: {{ printf "postgresql+psycopg2://%s:%s@%s-postgresql:5432/%s" .Values.postgresql.auth.username .Values.postgresql.auth.password (include "whispers.fullname" .) .Values.postgresql.auth.database | quote }}
   {{- else if .Values.sqlite.enabled }}

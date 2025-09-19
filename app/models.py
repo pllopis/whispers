@@ -1,7 +1,10 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import Column, String, LargeBinary, DateTime, Boolean, Text
+
+from sqlalchemy import Boolean, Column, DateTime, LargeBinary, String, Text
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Session
+
 from .db import Base
 
 class Secret(Base):
@@ -25,3 +28,17 @@ class Secret(Base):
         if exp.tzinfo is None:
             exp = exp.replace(tzinfo=timezone.utc)
         return now >= exp
+
+    @staticmethod
+    def purge_expired(db: Session) -> int:
+        """Delete expired secrets.
+
+        Returns the number of rows removed.
+        """
+
+        now = datetime.now(timezone.utc)
+        return (
+            db.query(Secret)
+            .filter(Secret.expires_at <= now)
+            .delete(synchronize_session=False)
+        )

@@ -30,6 +30,7 @@ env:
   GROUPS_CLAIM: "groups"
   BASE_URL: "http://localhost:8080"
   DATABASE_URL: ""  # auto-filled when postgresql.enabled or sqlite.enabled
+  PURGE_INTERVAL_SECONDS: 3600
 
 # Name of an existing Kubernetes Secret that provides sensitive values.
 # If set, the chart will not create its own Secret and will consume this one instead.

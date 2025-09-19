@@ -15,4 +15,6 @@ class Settings(BaseModel):
     database_url: str = os.getenv("DATABASE_URL", "sqlite:///./dev.db")
     base_url: str = os.getenv("BASE_URL", "http://localhost:8080")
 
+    purge_interval_seconds: int = int(os.getenv("PURGE_INTERVAL_SECONDS", "3600"))
+
 settings = Settings()

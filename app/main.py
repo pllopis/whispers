@@ -1,3 +1,5 @@
+import asyncio
+import logging
 import os
 import secrets as pysecrets
 from datetime import datetime, timedelta, timezone
@@ -28,6 +30,63 @@ app.add_middleware(
 )
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+DEFAULT_PURGE_INTERVAL_SECONDS = 3600
+PURGE_INTERVAL_SECONDS = getattr(settings, "purge_interval_seconds", DEFAULT_PURGE_INTERVAL_SECONDS)
+if PURGE_INTERVAL_SECONDS <= 0:
+    PURGE_INTERVAL_SECONDS = DEFAULT_PURGE_INTERVAL_SECONDS
+_purge_task: asyncio.Task | None = None
+
+
+def purge_expired_once() -> int:
+    with SessionLocal() as db:
+        try:
+            deleted = Secret.purge_expired(db)
+            db.commit()
+            return deleted
+        except Exception:
+            db.rollback()
+            raise
+
+
+async def _purge_expired_secrets_periodically():
+    while True:
+        try:
+            deleted = await asyncio.to_thread(purge_expired_once)
+            if deleted:
+                logger.info("Purged %d expired secrets", deleted)
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            logger.exception("Failed to purge expired secrets")
+        await asyncio.sleep(PURGE_INTERVAL_SECONDS)
+
+
+@app.on_event("startup")
+async def start_background_tasks():
+    global _purge_task
+    try:
+        await asyncio.to_thread(purge_expired_once)
+    except Exception:
+        logger.exception("Failed to purge expired secrets on startup")
+    if _purge_task is None or _purge_task.done():
+        _purge_task = asyncio.create_task(_purge_expired_secrets_periodically())
+
+
+@app.on_event("shutdown")
+async def stop_background_tasks():
+    global _purge_task
+    if _purge_task:
+        _purge_task.cancel()
+        try:
+            await _purge_task
+        except asyncio.CancelledError:
+            pass
+        _purge_task = None
 
 
 @app.exception_handler(HTTPException)
