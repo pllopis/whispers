@@ -2,6 +2,8 @@
 
 A tiny OIDC‑protected web service for creating and sharing time‑limited secrets via unique links.
 
+Created for [SKA](https://skao.int)'s SRCNet. Themed inspired by SKAO colours.
+
 - Authenticated via your organisation’s OIDC issuer
 - Per‑secret expiration
 - Allowed users and/or groups (from a configurable OIDC claim)
