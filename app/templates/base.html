@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Whispers{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}" />
+</head>
+<body>
+    <div class="page">
+        <header class="site-header">
+            <div class="container nav">
+                <a href="/" class="brand">Whispers</a>
+                <nav class="nav-links">
+                    {% if user %}
+                        <span class="user-chip">Signed in as <strong>{{ user.preferred_username or user.email or user.sub }}</strong></span>
+                        <a class="nav-link" href="/logout">Log out</a>
+                    {% else %}
+                        <a class="nav-link primary" href="/login">Log in</a>
+                    {% endif %}
+                </nav>
+            </div>
+        </header>
+        <main class="main">
+            <div class="container">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+        <footer class="site-footer">
+            <div class="container">
+                <p>Secure, ephemeral secret sharing for teams.</p>
+            </div>
+        </footer>
+    </div>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

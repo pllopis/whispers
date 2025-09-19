@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Whispers · Share secrets confidently{% endblock %}
+{% block content %}
+<section class="hero">
+    <h1>Whispers</h1>
+    <p>Share sensitive information through short-lived, access-controlled secrets protected by your identity provider.</p>
+</section>
+<section class="card">
+    <div class="card-header">
+        <h2>Create a secret</h2>
+        <p>Compose an encrypted message, choose who can view it, and share a one-time link.</p>
+    </div>
+    {% if not user %}
+    <div class="callout warning">
+        <p>You need to <a href="/login">sign in</a> before you can create a secret.</p>
+    </div>
+    {% endif %}
+    <form method="post" action="{{ url_for('create_secret') }}" class="secret-form">
+        <fieldset {% if not user %}disabled{% endif %}>
+            <div class="form-group">
+                <label for="title">Title <span class="hint">(optional)</span></label>
+                <input id="title" name="title" placeholder="e.g. VPN credentials" />
+            </div>
+            <div class="form-group">
+                <label for="content">Secret text <span class="hint required">*</span></label>
+                <textarea id="content" name="content" rows="6" required placeholder="Write the secret you want to share..."></textarea>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="expires_in_hours">Expires in</label>
+                    <div class="input-with-suffix">
+                        <input id="expires_in_hours" type="number" name="expires_in_hours" value="24" min="1" />
+                        <span class="suffix">hours</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="allowed_users">Allowed users</label>
+                    <input id="allowed_users" name="allowed_users" placeholder="Comma separated usernames" />
+                    <span class="help-text">Leave blank to allow any authenticated teammate.</span>
+                </div>
+                <div class="form-group">
+                    <label for="allowed_groups">Allowed groups</label>
+                    <input id="allowed_groups" name="allowed_groups" placeholder="Comma separated group names" />
+                    <span class="help-text">Grant access to entire teams without listing everyone.</span>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn primary" {% if not user %}disabled{% endif %}>Create secret</button>
+                <p class="disclaimer">Secrets are encrypted at rest and only revealed to authorized viewers.</p>
+            </div>
+        </fieldset>
+    </form>
+</section>
+{% endblock %}

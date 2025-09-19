@@ -1,12 +1,13 @@
 import os
 import secrets as pysecrets
 from datetime import datetime, timedelta, timezone
-from typing import List, Optional
+from typing import Optional
 
 from fastapi import FastAPI, Depends, Request, Form, HTTPException
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, PlainTextResponse
+from fastapi.responses import RedirectResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.exception_handlers import http_exception_handler as fastapi_http_exception_handler
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -14,7 +15,7 @@ from .config import settings
 from .db import SessionLocal, init_db
 from .models import Secret
 from .crypto import encrypt, decrypt
-from .auth import oauth, get_session, set_session, clear_session, SESSION_COOKIE
+from .auth import oauth, get_session, set_session, clear_session
 
 # Initialize
 init_db()
@@ -28,6 +29,28 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
 
+
+@app.exception_handler(HTTPException)
+async def styled_http_exception_handler(request: Request, exc: HTTPException):
+    accept_header = request.headers.get("accept", "").lower()
+    wants_json = "application/json" in accept_header
+    wants_html = "text/html" in accept_header
+
+    if exc.status_code == 403 and wants_html and not wants_json:
+        session = await get_session(request)
+        user = session.get("user")
+        return templates.TemplateResponse(
+            "forbidden.html",
+            {
+                "request": request,
+                "user": user,
+                "detail": exc.detail,
+            },
+            status_code=exc.status_code,
+        )
+
+    return await fastapi_http_exception_handler(request, exc)
+
 # --- DB dependency
 
 def get_db():
@@ -39,28 +62,17 @@ def get_db():
 
 # --- Simple pages (minimal UI)
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
 async def home(request: Request):
     session = await get_session(request)
     user = session.get("user")
-    return HTMLResponse(f"""
-        <html><body style='font-family:sans-serif'>
-        <h2>Whispers</h2>
-        <p>Logged in as: <b>{user.get('preferred_username') if user else 'anonymous'}</b></p>
-        <ul>
-          <li><a href='/login'>Login</a> | <a href='/logout'>Logout</a></li>
-        </ul>
-        <h3>Create a secret</h3>
-        <form method='post' action='/api/secrets'>
-          <label>Title (optional)</label><br/><input name='title' style='width:360px' /><br/>
-          <label>Secret text</label><br/><textarea name='content' rows=6 cols=60 required></textarea><br/>
-          <label>Expires in (hours)</label><br/><input type='number' name='expires_in_hours' value='24' min='1'/><br/>
-          <label>Allowed users (comma separated usernames)</label><br/><input name='allowed_users' style='width:360px' /><br/>
-          <label>Allowed groups (comma separated group names)</label><br/><input name='allowed_groups' style='width:360px' /><br/>
-          <button type='submit'>Create</button>
-        </form>
-        </body></html>
-    """)
+    return templates.TemplateResponse(
+        "home.html",
+        {
+            "request": request,
+            "user": user,
+        },
+    )
 
 # --- OIDC routes
 
@@ -133,12 +145,28 @@ async def create_secret(
     db.commit()
 
     share_url = f"{settings.base_url}/s/{token}"
-    return JSONResponse({
+    response_payload = {
         'id': str(s.id),
         'title': s.title,
         'share_url': share_url,
-        'expires_at': s.expires_at.isoformat(),
-    })
+        'expires_at': s.expires_at,
+    }
+
+    accept_header = request.headers.get('accept', '').lower()
+    if 'application/json' in accept_header:
+        json_payload = response_payload.copy()
+        json_payload['expires_at'] = s.expires_at.isoformat()
+        return JSONResponse(json_payload)
+
+    return templates.TemplateResponse(
+        "secret_created.html",
+        {
+            "request": request,
+            "user": user,
+            "secret": response_payload,
+        },
+        status_code=201,
+    )
 
 # --- API/Page: view secret by token
 
@@ -174,14 +202,21 @@ async def view_secret(token: str, request: Request, db: Session = Depends(get_db
         raise HTTPException(status_code=403, detail='Forbidden')
 
     plaintext = decrypt(s.ciphertext)
-    # Basic HTML rendering for convenience
-    return HTMLResponse(f"""
-        <html><body style='font-family:sans-serif'>
-        <h3>{(s.title or 'Secret')}</h3>
-        <pre style='white-space:pre-wrap;background:#f6f8fa;padding:12px;border-radius:8px'>{plaintext}</pre>
-        <p>Expires at: {s.expires_at.isoformat()}</p>
-        </body></html>
-    """)
+    secret_context = {
+        'title': s.title or 'Secret',
+        'content': plaintext,
+        'expires_at': s.expires_at,
+        'creator': s.creator,
+    }
+
+    return templates.TemplateResponse(
+        "view_secret.html",
+        {
+            "request": request,
+            "user": user,
+            "secret": secret_context,
+        },
+    )
 
 # --- Health
 @app.get('/healthz')

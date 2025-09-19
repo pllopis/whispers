@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Access denied · Whispers{% endblock %}
+{% block content %}
+<section class="card focus">
+    <div class="card-header">
+        <h2>Access denied</h2>
+        <p>This secret is locked down to a different set of teammates.</p>
+    </div>
+    <div class="callout error">
+        <p>{{ detail or "You do not have permission to view this page." }}</p>
+    </div>
+    <div class="form-actions">
+        <a class="btn secondary" href="/">Back to home</a>
+    </div>
+</section>
+{% endblock %}
