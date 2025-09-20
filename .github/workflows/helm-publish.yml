@@ -1,0 +1,63 @@
+name: Build and publish Helm chart
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'helm/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  HELM_EXPERIMENTAL_OCI: 1
+  CHART_DIR: helm/whispers
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Log in to ghcr.io
+        env:
+          GHCR_USERNAME: ${{ github.actor }}
+          GHCR_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$GHCR_PASSWORD" | helm registry login ghcr.io --username "$GHCR_USERNAME" --password-stdin
+
+      - name: Lint chart
+        run: helm lint "$CHART_DIR"
+
+      - name: Package chart
+        id: package
+        run: |
+          set -euo pipefail
+          rm -rf dist
+          mkdir -p dist
+          helm package "$CHART_DIR" --destination dist
+          chart_package=$(find dist -maxdepth 1 -type f -name '*.tgz' -print -quit)
+          if [[ -z "$chart_package" ]]; then
+            echo "Unable to locate packaged chart archive" >&2
+            exit 1
+          fi
+          echo "Packaged chart located at $chart_package"
+          echo "chart=$chart_package" >> "$GITHUB_OUTPUT"
+
+      - name: Push chart to ghcr.io
+        env:
+          CHART_PACKAGE: ${{ steps.package.outputs.chart }}
+        run: |
+          set -euo pipefail
+          owner=$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')
+          registry="oci://ghcr.io/${owner}/charts"
+          echo "Pushing $CHART_PACKAGE to $registry"
+          helm push "$CHART_PACKAGE" "$registry"
