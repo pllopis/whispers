@@ -203,12 +203,17 @@ async def create_secret(
     db.add(s)
     db.commit()
 
+    # SQLite may return naive datetimes; treat them as UTC
+    expires_at = s.expires_at
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+
     share_url = f"{settings.base_url}/s/{token}"
     response_payload = {
         'id': str(s.id),
         'title': s.title,
         'share_url': share_url,
-        'expires_at': s.expires_at,
+        'expires_at': expires_at,
     }
 
     accept_header = request.headers.get('accept', '').lower()
@@ -237,9 +242,14 @@ async def view_secret(token: str, request: Request, db: Session = Depends(get_db
         return RedirectResponse(url='/login')
 
     s: Secret | None = db.query(Secret).filter(Secret.token == token).first()
+
+    # SQLite may return naive datetimes; treat them as UTC
+    expires_at = s.expires_at
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
     if not s or s.revoked:
         raise HTTPException(status_code=404, detail='Not found')
-    if s.is_expired():
+    if datetime.now(timezone.utc) >= expires_at.astimezone(timezone.utc):
         raise HTTPException(status_code=410, detail='Expired')
 
     username = user.get('preferred_username') or user.get('email') or user.get('sub')
@@ -264,7 +274,7 @@ async def view_secret(token: str, request: Request, db: Session = Depends(get_db
     secret_context = {
         'title': s.title or 'Secret',
         'content': plaintext,
-        'expires_at': s.expires_at,
+        'expires_at': expires_at,
         'creator': s.creator,
     }
 

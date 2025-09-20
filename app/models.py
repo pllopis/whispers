@@ -21,14 +21,6 @@ class Secret(Base):
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     revoked = Column(Boolean, default=False)
 
-    def is_expired(self) -> bool:
-        now = datetime.now(timezone.utc)
-        exp = self.expires_at
-        # SQLite may return naive datetimes; treat them as UTC
-        if exp.tzinfo is None:
-            exp = exp.replace(tzinfo=timezone.utc)
-        return now >= exp
-
     @staticmethod
     def purge_expired(db: Session) -> int:
         """Delete expired secrets.
