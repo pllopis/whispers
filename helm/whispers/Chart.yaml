@@ -3,8 +3,8 @@ name: whispers
 version: 0.1.0
 description: Whispers is an OIDC-protected secret sharing service
 appVersion: "0.1.0"
-#dependencies:
-#- name: postgresql
-version: 15.5.16
-repository: https://charts.bitnami.com/bitnami
-#condition: postgresql.enabled
+dependencies:
+  - name: postgresql
+    version: 15.5.16
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled

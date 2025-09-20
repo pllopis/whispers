@@ -43,7 +43,7 @@ jobs:
           set -euo pipefail
           rm -rf dist
           mkdir -p dist
-          helm package "$CHART_DIR" --destination dist
+          helm package -u "$CHART_DIR" --destination dist
           chart_package=$(find dist -maxdepth 1 -type f -name '*.tgz' -print -quit)
           if [[ -z "$chart_package" ]]; then
             echo "Unable to locate packaged chart archive" >&2
