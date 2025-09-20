@@ -1,5 +1,5 @@
 image:
-  repository: whispers
+  repository: ghcr.io/pllopis/whispers:main
   tag: "0.1.0"
   pullPolicy: IfNotPresent
 
