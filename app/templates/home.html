@@ -7,7 +7,7 @@
 </section>
 <section class="card">
     <div class="card-header">
-        <h2>Create a secret</h2>
+        <h2>Whisper a secret</h2>
         <p>Compose an encrypted message, choose who can view it, and share a one-time link.</p>
     </div>
     {% if not user %}
@@ -29,24 +29,22 @@
                 <div class="form-group">
                     <label for="expires_in_hours">Expires in</label>
                     <div class="input-with-suffix">
-                        <input id="expires_in_hours" type="number" name="expires_in_hours" value="24" min="1" />
+                        <input id="expires_in_hours" type="number" name="expires_in_hours" value="8" min="1" />
                         <span class="suffix">hours</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="allowed_users">Allowed users</label>
                     <input id="allowed_users" name="allowed_users" placeholder="Comma separated usernames" />
-                    <span class="help-text">Leave blank to allow any authenticated teammate.</span>
                 </div>
                 <div class="form-group">
                     <label for="allowed_groups">Allowed groups</label>
                     <input id="allowed_groups" name="allowed_groups" placeholder="Comma separated group names" />
-                    <span class="help-text">Grant access to entire teams without listing everyone.</span>
                 </div>
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn primary" {% if not user %}disabled{% endif %}>Create secret</button>
-                <p class="disclaimer">Secrets are encrypted at rest and only revealed to authorized viewers.</p>
+                <button type="submit" class="btn primary" {% if not user %}disabled{% endif %}>Create whisper</button>
+                <p class="disclaimer">Secrets are encrypted at rest and only revealed to authorized viewers.  Leaving both users and groups blank will enable anyone logged in to see the secret.</p>
             </div>
         </fieldset>
     </form>
