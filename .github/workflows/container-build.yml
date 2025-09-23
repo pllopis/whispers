@@ -45,11 +45,12 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             # ---- for main branch builds ----
-            type=raw,value=main,enable={{is_default_branch}}
-            type=sha,enable={{is_default_branch}}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
             # ---- for version tag builds (tags like v0.1.0) ----
-            type=semver,pattern={{version}},enable={{is_tag}}
-            type=raw,value=latest,enable={{is_tag}}
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/') }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
