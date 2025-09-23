@@ -1,6 +1,6 @@
 image:
-  repository: ghcr.io/pllopis/whispers:main
-  tag: "0.1.0"
+  repository: ghcr.io/pllopis/whispers
+  tag: "main"
   pullPolicy: IfNotPresent
 
 replicaCount: 1
@@ -23,8 +23,8 @@ resources: {}
 
 env:
   OIDC_ISSUER: "https://ska-iam.stfc.ac.uk/"
-  OIDC_CLIENT_ID: "ad6c1f2e-a1e8-4d31-9f43-972432778d78"
-  OIDC_CLIENT_SECRET: "AM9_t05Uaq0VZPLmGW8Fw0RKk1ghbcjH7BX4lj3qwdUIVgwRzVnKO42Q0qN48Yy-UGQJqECmdjVh0ksAJDPtXOg"   # Ignored if existingSecret is set
+  OIDC_CLIENT_ID: "your-client-id"
+  OIDC_CLIENT_SECRET: "your-client-secret"   # Ignored if existingSecret is set
   OIDC_REDIRECT_URI: "http://localhost:8080/callback"
   OIDC_SCOPES: "openid profile email groups offline_access"
   GROUPS_CLAIM: "groups"
