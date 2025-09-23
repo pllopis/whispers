@@ -6,6 +6,10 @@ on:
       - main
     tags:
       - 'v*'
+    paths:
+      - 'app/**'
+      - 'Dockerfile'
+      - 'pyproject.toml'
   workflow_dispatch:
 
 permissions:
@@ -39,6 +43,13 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            # ---- for main branch builds ----
+            type=raw,value=main,enable={{is_default_branch}}
+            type=sha,enable={{is_default_branch}}
+            # ---- for version tag builds (tags like v0.1.0) ----
+            type=semver,pattern={{version}},enable={{is_tag}}
+            type=raw,value=latest,enable={{is_tag}}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
