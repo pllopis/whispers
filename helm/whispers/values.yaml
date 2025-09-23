@@ -1,6 +1,6 @@
 image:
   repository: ghcr.io/pllopis/whispers
-  tag: "main"
+  tag: "0.1.0"
   pullPolicy: IfNotPresent
 
 replicaCount: 1

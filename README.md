@@ -1,6 +1,8 @@
 # Whispers
 
-A tiny OIDC‑protected web service for creating and sharing time‑limited secrets via unique links.
+A simple OIDC‑protected web service for creating and sharing ephemeral, time‑limited secrets via unique links.
+
+![App Appearance](img/whispers.png)
 
 Created for [SKA](https://skao.int)'s SRCNet. Themed inspired by SKAO colours.
 
