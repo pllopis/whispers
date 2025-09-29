@@ -129,14 +129,15 @@ If both allowed lists are empty, any authenticated user may view until expiry.
 
 ## Environment variables
 
+- `IMAGE_TAG`: Image version tag (For docker compose only, use values.yaml for Helm deployment)
 - `OIDC_ISSUER`
 - `OIDC_CLIENT_ID`
 - `OIDC_CLIENT_SECRET`
 - `OIDC_REDIRECT_URI`
-- `OIDC_SCOPES` (default `openid profile email groups`)
+- `OIDC_SCOPES` (default `openid email groups)`
 - `GROUPS_CLAIM` (default `groups`)
-- `SESSION_SECRET`
-- `FERNET_KEY`
+- `SESSION_SECRET`: Any long key should work, used for cookie HMAC
+- `FERNET_KEY`: Used for encryption at-rest. [See how to generate one](#3-create-namespace-and-secret).
 - `BASE_URL` (no trailing slash)
-- `DATABASE_URL` (set only if not using SQLite)
+- `DATABASE_URL` (required only if not using SQLite)
 
