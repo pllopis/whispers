@@ -1,0 +1,34 @@
+services:
+  app:
+    image: ghcr.io/pllopis/whispers:${IMAGE_TAG:-0.1.0}
+    #build:
+    #  context: .
+    #  dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    
+    environment:
+      ### These need to be defined, either here or in .env)
+      # OIDC_ISSUER: ${OIDC_ISSUER}
+      # OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
+      # OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+      # OIDC_REDIRECT_URI: ${OIDC_REDIRECT_URI}
+      # SESSION_SECRET: ${SESSION_SECRET}
+      # FERNET_KEY: ${FERNET_KEY}
+      BASE_URL: ${BASE_URL:-http://localhost:8080}
+      OIDC_SCOPES: ${OIDC_SCOPES:-openid email}
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////data/whispers.db}
+      GROUPS_CLAIM: ${GROUPS_CLAIM:-groups}
+    volumes:
+      - whispers_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  whispers_data:

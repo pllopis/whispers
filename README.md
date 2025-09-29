@@ -12,14 +12,56 @@ Created for [SKA](https://skao.int)'s SRCNet. Themed inspired by SKAO colours.
 - Encrypted at rest (Fernet)
 - SQLite by default (simple single‑pod), Postgres optional
 
-## Quick start on kind (SQLite)
+## Quick start with Docker Compose
+
+### 1. Prerequisites
+
+- Docker
+- An OIDC client registered at your IdP
+  Example Redirect URI: `http://localhost:8080/callback`  
+  Minimal scopes: `openid email`
+
+### 2. Create `.env`
+
+These are the required environment variables. Adapt to your use case.
+
+```dotenv
+# VERSION
+IMAGE_TAG=0.1.0
+
+# OIDC
+OIDC_ISSUER=<issuer-url>
+OIDC_CLIENT_ID=<client-id>
+OIDC_CLIENT_SECRET=<client-secret>
+OIDC_REDIRECT_URI=http://localhost:8080/callback
+GROUPS_CLAIM=groups
+
+# Encryption
+SESSION_SECRET=<random-urlsafe-string>
+FERNET_KEY=<base64-urlsafe-fernet-key>
+
+# Base URL
+BASE_URL=http://localhost:8080
+
+# Expired secret purge interval
+PURGE_INTERVAL_SECONDS=3600
+```
+
+### 3. Run
+
+```bash
+# export DOCKER_DEFAULT_PLATFORM=linux/amd64 # might need this on MacOS
+docker compose up
+```
+
+## Quick start on kind
 
 ### 1. Prerequisites
 
 - Docker, kind, kubectl, Helm
 - An OIDC client registered at your IdP  
   Redirect URI: `http://localhost:8080/callback`  
-  Scopes: `openid profile email groups`
+  Scopes: `openid email groups`
 
 ### 2. Build the image
 
