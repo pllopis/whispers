@@ -246,8 +246,23 @@ body::before {
 
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1.5rem;
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.form-grid .expires-field {
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .form-grid {
+        grid-template-columns: minmax(0, 11rem) repeat(2, minmax(0, 1fr));
+        align-items: end;
+    }
+
+    .form-grid .expires-field {
+        max-width: 9rem;
+    }
 }
 
 label {

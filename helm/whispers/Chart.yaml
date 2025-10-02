@@ -1,8 +1,8 @@
 apiVersion: v2
 name: whispers
-version: 0.1.0
+version: 0.1.1
 description: Whispers is an OIDC-protected secret sharing service
-appVersion: "0.1.0"
+appVersion: "0.1.1"
 dependencies:
   - name: postgresql
     version: 15.5.16

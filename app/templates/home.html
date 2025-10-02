@@ -26,7 +26,7 @@
                 <textarea id="content" name="content" rows="6" required placeholder="Write the secret you want to share..."></textarea>
             </div>
             <div class="form-grid">
-                <div class="form-group">
+                <div class="form-group expires-field">
                     <label for="expires_in_hours">Expires in</label>
                     <div class="input-with-suffix">
                         <input id="expires_in_hours" type="number" name="expires_in_hours" value="8" min="1" />
@@ -34,8 +34,8 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="allowed_users">Allowed users</label>
-                    <input id="allowed_users" name="allowed_users" placeholder="Comma separated usernames" />
+                    <label for="allowed_users">Allowed users or emails</label>
+                    <input id="allowed_users" name="allowed_users" placeholder="e.g. user1, user2@mail.com" />
                 </div>
                 <div class="form-group">
                     <label for="allowed_groups">Allowed groups</label>

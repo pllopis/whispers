@@ -253,6 +253,7 @@ async def view_secret(token: str, request: Request, db: Session = Depends(get_db
         raise HTTPException(status_code=410, detail='Expired')
 
     username = user.get('preferred_username') or user.get('email') or user.get('sub')
+    email = user.get('email')
     groups = set(user.get(settings.groups_claim) or [])
 
     # Authorization check
@@ -261,7 +262,7 @@ async def view_secret(token: str, request: Request, db: Session = Depends(get_db
 
     authorized = False
     if allowed_users:
-        authorized = username in allowed_users
+        authorized = username in allowed_users or email in allowed_users
     if not authorized and allowed_groups:
         authorized = len(groups.intersection(allowed_groups)) > 0
     if not allowed_users and not allowed_groups:
