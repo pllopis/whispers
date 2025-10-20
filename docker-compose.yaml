@@ -1,11 +1,12 @@
 services:
-  app:
-    image: ghcr.io/pllopis/whispers:${IMAGE_TAG:-0.1.1}
+  whispers:
+    image: ghcr.io/pllopis/whispers:${IMAGE_TAG:-0.2.0}
+    container_name: whispers
     #build:
     #  context: .
     #  dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "${HOST_PORT:-8080}:8080"
     env_file:
       - .env
     
@@ -18,7 +19,7 @@ services:
       # SESSION_SECRET: ${SESSION_SECRET}
       # FERNET_KEY: ${FERNET_KEY}
       BASE_URL: ${BASE_URL:-http://localhost:8080}
-      OIDC_SCOPES: ${OIDC_SCOPES:-openid email}
+      OIDC_SCOPES: ${OIDC_SCOPES:-openid profile email}
       DATABASE_URL: ${DATABASE_URL:-sqlite:////data/whispers.db}
       GROUPS_CLAIM: ${GROUPS_CLAIM:-groups}
     volumes:
