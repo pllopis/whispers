@@ -27,7 +27,7 @@ These are the required environment variables. Adapt to your use case.
 
 ```dotenv
 # VERSION
-IMAGE_TAG=0.1.1
+IMAGE_TAG=0.2.0
 
 # OIDC
 OIDC_ISSUER=<issuer-url>
@@ -66,8 +66,8 @@ docker compose up
 ### 2. Build the image
 
 ```bash
-docker build . -t whispers:0.1.1
-kind load docker-image whispers:0.1.1 -n whispers
+docker build . -t whispers:0.2.0
+kind load docker-image whispers:0.2.0 -n whispers
 ```
 
 ### 3. Create namespace and Secret
