@@ -31,11 +31,3 @@ async def set_session(response: RedirectResponse, data: dict):
 
 async def clear_session(response: RedirectResponse):
     response.delete_cookie(SESSION_COOKIE)
-
-async def require_login(request: Request):
-    session = await get_session(request)
-    if session.get("user"):
-        return session
-    # save where to go back to
-    request.session["post_login_redirect"] = str(request.url)
-    return RedirectResponse(url="/login")

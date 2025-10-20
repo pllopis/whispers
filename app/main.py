@@ -154,7 +154,8 @@ async def auth_callback(request: Request):
         'preferred_username': userinfo.get('preferred_username') or userinfo.get('email') or userinfo.get('sub'),
         settings.groups_claim: userinfo.get(settings.groups_claim, []),
     }
-    resp = RedirectResponse(url='/')
+    post_login_redirect = request.session.pop("post_login_redirect", "/")
+    resp = RedirectResponse(url=post_login_redirect)
     await set_session(resp, { 'user': user })
     return resp
 
@@ -170,6 +171,7 @@ def current_user_or_401(session: dict) -> dict:
     user = session.get('user')
     if not user:
         raise HTTPException(status_code=401, detail='Not authenticated')
+    logging.info(f"Authenticated as user: {user}")
     return user
 
 # --- API: create secret
@@ -239,6 +241,7 @@ async def view_secret(token: str, request: Request, db: Session = Depends(get_db
     session = await get_session(request)
     user = session.get('user')
     if not user:
+        request.session["post_login_redirect"] = str(request.url)
         return RedirectResponse(url='/login')
 
     s: Secret | None = db.query(Secret).filter(Secret.token == token).first()
