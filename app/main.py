@@ -32,8 +32,10 @@ app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__
 templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
 
 
-logging.basicConfig(level=logging.INFO)
+log_level = getattr(logging, os.getenv("LOG_LEVEL", "INFO").upper(), logging.INFO)
+logging.basicConfig(level=log_level)
 logger = logging.getLogger(__name__)
+logger.info(f"Logging initialized at {log_level} level")
 
 DEFAULT_PURGE_INTERVAL_SECONDS = 3600
 PURGE_INTERVAL_SECONDS = getattr(settings, "purge_interval_seconds", DEFAULT_PURGE_INTERVAL_SECONDS)
@@ -138,25 +140,33 @@ async def home(request: Request):
 @app.get('/login')
 async def login(request: Request):
     redirect_uri = settings.oidc_redirect_uri
+    logging.debug(f"Authorize with scopes: {settings.oidc_scopes}")
     return await oauth.oidc.authorize_redirect(request, redirect_uri)
 
 @app.get('/callback')
 async def auth_callback(request: Request):
     token = await oauth.oidc.authorize_access_token(request)
-    userinfo = token.get('userinfo')
-    if not userinfo:
-        # Fallback to userinfo endpoint
-        userinfo = await oauth.oidc.userinfo(token=token)
-    # Save small subset in session cookie
+
+    # Always fetch from the userinfo endpoint
+    userinfo = await oauth.oidc.userinfo(token=token)
+    logging.debug(f"/userinfo response: {userinfo}")
+
     user = {
         'sub': userinfo.get('sub'),
         'email': userinfo.get('email'),
-        'preferred_username': userinfo.get('preferred_username') or userinfo.get('email') or userinfo.get('sub'),
-        settings.groups_claim: userinfo.get(settings.groups_claim, []),
+        'preferred_username': (
+            userinfo.get('preferred_username')
+            or userinfo.get('email')
+            or userinfo.get('sub')
+        ),
     }
+    # only add groups_claim if it's configured
+    if settings.groups_claim:
+        user[settings.groups_claim] = userinfo.get(settings.groups_claim, [])
+
     post_login_redirect = request.session.pop("post_login_redirect", "/")
     resp = RedirectResponse(url=post_login_redirect)
-    await set_session(resp, { 'user': user })
+    await set_session(resp, {'user': user})
     return resp
 
 @app.get('/logout')
