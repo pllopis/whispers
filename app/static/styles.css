@@ -513,6 +513,12 @@ textarea:focus {
     margin: 0;
 }
 
+.footer-version {
+    font-size: 0.75rem;
+    color: var(--muted-strong);
+    letter-spacing: 0.02em;
+}
+
 .site-footer .github-link {
     display: inline-flex;
     align-items: center;

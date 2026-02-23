@@ -3,6 +3,7 @@ import logging
 import os
 import secrets as pysecrets
 from datetime import datetime, timedelta, timezone
+from importlib import metadata
 from typing import Optional
 
 from fastapi import FastAPI, Depends, Request, Form, HTTPException
@@ -30,6 +31,15 @@ app.add_middleware(
 )
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
+
+def _resolve_app_version() -> str:
+    try:
+        return metadata.version("whispers")
+    except metadata.PackageNotFoundError:
+        return "dev"
+
+APP_VERSION = _resolve_app_version()
+templates.env.globals["app_version"] = APP_VERSION
 
 
 log_level = getattr(logging, os.getenv("LOG_LEVEL", "INFO").upper(), logging.INFO)
