@@ -33,7 +33,7 @@ These are the required environment variables:
 
 ```dotenv
 # VERSION
-IMAGE_TAG=0.2.1
+IMAGE_TAG=0.3.0
 # IMAGE_URL=whispers # in case you build the image locally with `docker build . -t whispers:${IMAGE_TAG}`
 # otherwise the IMAGE_URL will default to GHCR.
 
