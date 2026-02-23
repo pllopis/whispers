@@ -8,6 +8,7 @@ class Settings(BaseModel):
     oidc_redirect_uri: str = os.getenv("OIDC_REDIRECT_URI", "http://localhost:8080/callback")
     oidc_scopes: str = os.getenv("OIDC_SCOPES", "openid profile email groups")
     groups_claim: str = os.getenv("GROUPS_CLAIM", "groups")
+    disable_groups: bool = os.getenv("DISABLE_GROUPS", "false")
 
     session_secret: str = os.getenv("SESSION_SECRET", "change-me-session-secret")
     fernet_key: str = os.getenv("FERNET_KEY", "")

@@ -8,6 +8,7 @@ data:
   OIDC_REDIRECT_URI: {{ .Values.env.OIDC_REDIRECT_URI | quote }}
   OIDC_SCOPES: {{ .Values.env.OIDC_SCOPES | quote }}
   GROUPS_CLAIM: {{ .Values.env.GROUPS_CLAIM | quote }}
+  DISABLE_GROUPS: {{ .Values.env.DISABLE_GROUPS | quote }}
   BASE_URL: {{ .Values.env.BASE_URL | quote }}
   PURGE_INTERVAL_SECONDS: {{ .Values.env.PURGE_INTERVAL_SECONDS | quote }}
   {{- if .Values.postgresql.enabled }}

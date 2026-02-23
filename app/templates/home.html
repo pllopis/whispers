@@ -25,7 +25,7 @@
                 <label for="content">Secret text <span class="hint required">*</span></label>
                 <textarea id="content" name="content" rows="6" required placeholder="Write the secret you want to share..."></textarea>
             </div>
-            <div class="form-grid">
+            <div class="form-grid{% if disable_groups %} no-groups{% endif %}">
                 <div class="form-group expires-field">
                     <label for="expires_in_hours">Expires in</label>
                     <div class="input-with-suffix">
@@ -37,14 +37,23 @@
                     <label for="allowed_users">Allowed users or emails</label>
                     <input id="allowed_users" name="allowed_users" placeholder="e.g. user1, user2@mail.com" />
                 </div>
+                {% if not disable_groups %}
                 <div class="form-group">
                     <label for="allowed_groups">Allowed groups</label>
                     <input id="allowed_groups" name="allowed_groups" placeholder="Comma separated group names" />
                 </div>
+                {% endif %}
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn primary" {% if not user %}disabled{% endif %}>Create whisper</button>
-                <p class="disclaimer">Secrets are encrypted at rest and only revealed to authorized viewers.  Leaving both users and groups blank will enable anyone logged in to see the secret.</p>
+                <p class="disclaimer">
+                    Secrets are encrypted at rest and only revealed to authorized viewers.
+                    {% if disable_groups %}
+                    Leaving users blank will enable anyone logged in to see the secret.
+                    {% else %}
+                    Leaving both users and groups blank will enable anyone logged in to see the secret.
+                    {% endif %}
+                </p>
             </div>
         </fieldset>
     </form>

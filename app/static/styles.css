@@ -260,6 +260,10 @@ body::before {
         align-items: end;
     }
 
+    .form-grid.no-groups {
+        grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+    }
+
     .form-grid .expires-field {
         max-width: 9rem;
     }

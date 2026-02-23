@@ -22,6 +22,7 @@ services:
       OIDC_SCOPES: ${OIDC_SCOPES:-openid profile email}
       DATABASE_URL: ${DATABASE_URL:-sqlite:////data/whispers.db}
       GROUPS_CLAIM: ${GROUPS_CLAIM:-groups}
+      DISABLE_GROUPS: ${DISABLE_GROUPS:-false}
     volumes:
       - whispers_data:/data
     healthcheck:

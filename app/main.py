@@ -132,6 +132,7 @@ async def home(request: Request):
         {
             "request": request,
             "user": user,
+            "disable_groups": settings.disable_groups,
         },
     )
 

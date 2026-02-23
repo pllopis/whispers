@@ -107,6 +107,7 @@ env:
   OIDC_REDIRECT_URI: "http://localhost:8080/callback"
   BASE_URL: "http://localhost:8080"
   GROUPS_CLAIM: "groups"
+  DISABLE_GROUPS: "false"
 existingSecret: "whispers-secrets"
 sqlite:
   enabled: true
@@ -138,8 +139,8 @@ If both allowed lists are empty, any authenticated user may view until expiry.
 - `OIDC_REDIRECT_URI`
 - `OIDC_SCOPES` (default `openid email groups)`
 - `GROUPS_CLAIM` (default `groups`)
+- `DISABLE_GROUPS` (default `false`, hide allowed groups field on new whispers)
 - `SESSION_SECRET`: Any long key should work, used for cookie HMAC
 - `FERNET_KEY`: Used for encryption at-rest. [See how to generate one](#3-create-namespace-and-secret).
 - `BASE_URL` (no trailing slash)
 - `DATABASE_URL` (required only if not using SQLite)
-

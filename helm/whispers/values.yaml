@@ -30,6 +30,7 @@ env:
   OIDC_REDIRECT_URI: "http://localhost:8080/callback"
   OIDC_SCOPES: "openid profile email groups offline_access"
   GROUPS_CLAIM: "groups"
+  DISABLE_GROUPS: "false"
   BASE_URL: "http://localhost:8080"
   DATABASE_URL: ""  # auto-filled when postgresql.enabled or sqlite.enabled
   PURGE_INTERVAL_SECONDS: 3600
