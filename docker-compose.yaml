@@ -1,6 +1,6 @@
 services:
   whispers:
-    image: ${IMAGE_URL:-ghcr.io/pllopis/whispers}:${IMAGE_TAG:-0.2.0}
+    image: ${IMAGE_URL:-ghcr.io/pllopis/whispers}:${IMAGE_TAG:-0.2.1}
     container_name: whispers
     #build:
     #  context: .
