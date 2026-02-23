@@ -18,11 +18,26 @@ dependencies = [
   "itsdangerous==2.2.0",
   "cryptography==43.0.1",
   "SQLAlchemy==2.0.34",
-  "psycopg2-binary==2.9.9"
+  "psycopg2-binary==2.9.11"
 ]
+
+[project.optional-dependencies]
+dev = ["python-semantic-release>=10"]
 
 [tool.setuptools]
 package-dir = {"" = "app"}
 
 [tool.setuptools.packages.find]
 where = ["app"]
+
+[tool.semantic_release]
+allow_zero_version = true
+commit_parser = "conventional"
+tag_format = "v{version}"
+commit_message = "chore(release): v{version}"
+version_toml = ["pyproject.toml:project.version"]
+version_variables = [
+  ".env.example:IMAGE_TAG:nf",
+  "README.md:IMAGE_TAG:nf",
+]
+build_command = "python3 scripts/update_chart_yaml.py"

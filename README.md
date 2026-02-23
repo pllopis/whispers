@@ -23,12 +23,18 @@ Created for [SKA](https://skao.int)'s SRCNet. Themed inspired by SKAO colours.
 
 ### 2. Create `.env`
 
-These are the required environment variables. Adapt to your use case.
+Start from the example, then adapt to your use case.
+
+```bash
+cp .env.example .env
+```
+
+These are the required environment variables:
 
 ```dotenv
 # VERSION
 IMAGE_TAG=0.2.1
-# IMAGE_URL=whispers # in case you build the image locally with `docker build . -t whispers:0.2.1`
+# IMAGE_URL=whispers # in case you build the image locally with `docker build . -t whispers:${IMAGE_TAG}`
 # otherwise the IMAGE_URL will default to GHCR.
 
 # OIDC
@@ -68,8 +74,8 @@ docker compose up
 ### 2. Build the image
 
 ```bash
-docker build . -t whispers:0.2.1
-kind load docker-image whispers:0.2.1 -n whispers
+docker build . -t whispers:${IMAGE_TAG}
+kind load docker-image whispers:${IMAGE_TAG} -n whispers
 ```
 
 ### 3. Create namespace and Secret
@@ -144,3 +150,18 @@ If both allowed lists are empty, any authenticated user may view until expiry.
 - `FERNET_KEY`: Used for encryption at-rest. [See how to generate one](#3-create-namespace-and-secret).
 - `BASE_URL` (no trailing slash)
 - `DATABASE_URL` (required only if not using SQLite)
+
+## Release
+
+Dry-run version calculation:
+
+```bash
+semantic-release -v --noop version
+```
+
+Create the release commit and tag locally:
+
+```bash
+semantic-release version --no-push --no-vcs-release
+git push --follow-tags
+```
