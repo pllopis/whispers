@@ -204,13 +204,28 @@ async def create_secret(
     expires_at = datetime.now(timezone.utc) + timedelta(hours=expires_in_hours)
     ciphertext = encrypt(content)
 
+    creator_identity = (
+        user.get('preferred_username')
+        or user.get('email')
+        or user.get('sub')
+    )
+    # Normalize allowlists. Only auto-include the creator if the secret is
+    # explicitly restricted; otherwise we'd turn an "open" secret into
+    # creator-only access (authorization treats any non-empty allowed_users
+    # list as restrictive).
+    allowed_users_list = [u.strip() for u in (allowed_users or "").split(',') if u.strip()]
+    allowed_groups_list = [g.strip() for g in (allowed_groups or "").split(',') if g.strip()]
+    if allowed_users_list or allowed_groups_list:
+        if creator_identity and creator_identity not in allowed_users_list:
+            allowed_users_list.append(creator_identity)
+
     s = Secret(
         token=token,
         title=title,
         ciphertext=ciphertext,
-        creator=user.get('preferred_username') or user.get('sub'),
-        allowed_users=",".join([u.strip() for u in (allowed_users or "").split(',') if u.strip()]) or None,
-        allowed_groups=",".join([g.strip() for g in (allowed_groups or "").split(',') if g.strip()]) or None,
+        creator=creator_identity,
+        allowed_users=",".join(allowed_users_list) or None,
+        allowed_groups=",".join(allowed_groups_list) or None,
         expires_at=expires_at,
     )
     db.add(s)
