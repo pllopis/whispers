@@ -28,6 +28,8 @@ These are the required environment variables. Adapt to your use case.
 ```dotenv
 # VERSION
 IMAGE_TAG=0.2.0
+# IMAGE_URL=whispers # in case you build the image locally with `docker build . -t whispers:0.2.0`
+# otherwise the IMAGE_URL will default to GHCR.
 
 # OIDC
 OIDC_ISSUER=<issuer-url>
