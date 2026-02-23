@@ -40,4 +40,5 @@ version_variables = [
   ".env.example:IMAGE_TAG:nf",
   "README.md:IMAGE_TAG:nf",
 ]
+assets = ["helm/whispers/Chart.yaml"]
 build_command = "python3 scripts/update_chart_yaml.py"
